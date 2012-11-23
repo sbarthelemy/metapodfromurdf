@@ -1,0 +1,6 @@
+<project name="metapodfromurdf">
+  <!-- Add your project dependencies here -->
+  <depends buildtime="true" runtime="true" names="gtest"/>
+  <depends buildtime="true" names="eigen3"/>
+  <depends buildtime="true" names="metapod"/>
+</project>
