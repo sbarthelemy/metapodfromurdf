@@ -400,8 +400,7 @@ Status RobotBuilder::addSubTree(
       mass,
       center_of_mass,
       rotational_inertia,
-      tab,
-      has_parent);
+      tab);
   ++nb_bodies_;
   nb_dof_ += joint_nb_dof;
   const unsigned int tab_size = std::string("Node< ").length(); // TODO: account for initial indent
