@@ -21,26 +21,26 @@ namespace metapodfromurdf {
 // Utility functions
 
 // construct vector
-metapod::vector3d toMetapod(urdf::Vector3 v)
+metapod::Vector3d toMetapod(urdf::Vector3 v)
 {
-  return metapod::vector3d(v.x, v.y, v.z);
+  return metapod::Vector3d(v.x, v.y, v.z);
 }
 
 // construct pose
 metapod::Spatial::Transform toSpatialTransform(urdf::Pose p)
 {
   Eigen::Quaterniond q(p.rotation.w, p.rotation.x, p.rotation.y, p.rotation.z);
-  metapod::matrix3d R;
+  metapod::Matrix3d R;
   R = q.cast<metapod::FloatType>();
-  metapod::vector3d r = toMetapod(p.position);
+  metapod::Vector3d r = toMetapod(p.position);
   return metapod::Spatial::Transform(R, -R.transpose()*r);
 }
 
 metapod::Spatial::Transform toSpatialTransform(Eigen::Quaterniond q)
 {
-  metapod::matrix3d R;
+  metapod::Matrix3d R;
   R = q;
-  return metapod::Spatial::Transform(R, metapod::vector3d::Zero());
+  return metapod::Spatial::Transform(R, metapod::Vector3d::Zero());
 }
 
 LinkComparer::LinkComparer() {}
@@ -345,14 +345,14 @@ Status RobotBuilder::addSubTree(
   }
   metapod::Spatial::Transform static_transform =
       toSpatialTransform(jnt->parent_to_joint_origin_transform).inverse();
-  metapod::vector3d axis = toMetapod(jnt->axis);
+  metapod::Vector3d axis = toMetapod(jnt->axis);
 
   // convert the link (a.k.a. body)
   // TODO: check root->name is a valid class name
 
   // constructs the optional inertia
-  metapod::vector3d center_of_mass = metapod::vector3d::Zero();
-  metapod::matrix3d rotational_inertia = metapod::matrix3d::Identity();
+  metapod::Vector3d center_of_mass = metapod::Vector3d::Zero();
+  metapod::Matrix3d rotational_inertia = metapod::Matrix3d::Identity();
   double mass = 1.;
   if (root->inertial)
   {
@@ -365,7 +365,7 @@ Status RobotBuilder::addSubTree(
     // and whose basis is arbitrary
     // So, let's rotate it! (Yeah!)
     Eigen::Quaterniond q(p.rotation.w, p.rotation.x, p.rotation.y, p.rotation.z);
-    metapod::matrix3d R;
+    metapod::Matrix3d R;
     R = q.cast<metapod::FloatType>();
     Eigen::Matrix3d tmp;
     tmp << root->inertial->ixx, root->inertial->ixy, root->inertial->ixz,
