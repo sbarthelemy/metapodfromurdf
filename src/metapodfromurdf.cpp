@@ -103,8 +103,6 @@ RobotBuilder::~RobotBuilder()
 
   init_cc_ << namespaces_closing_;
 
-  closeInclusionGuard(init_hh_, "INIT_HH");
-
   joint_hh_ << namespaces_closing_;
   closeInclusionGuard(joint_hh_, "JOINT_HH");
 
@@ -232,10 +230,6 @@ Status RobotBuilder::init()
 
   init_cc_
     << "# include \"" << name_ << ".hh\"\n\n"
-    << "template struct metapod::crba< " << namespace_ << "::Robot , true >;\n"
-    << "template struct metapod::rnea< " << namespace_ << "::Robot , true >;\n"
-    << "template struct metapod::crba< " << namespace_ << "::Robot , false >;\n"
-    << "template struct metapod::rnea< " << namespace_ << "::Robot , false >;\n"
     << namespaces_opening_;
 
   init_cc_
@@ -247,14 +241,9 @@ Status RobotBuilder::init()
 
   openInclusionGuard(init_hh_, "INIT_HH");
   init_hh_
-    << "# include \"metapod/tools/common.hh\"\n"
-    << "# include \"metapod/algos/rnea.hh\"\n"
-    << "# include \"metapod/algos/crba.hh\"\n"
-    << "# include \"robot.hh\"\n\n"
-    << "extern template struct metapod::crba< " << namespace_ << "::Robot , true >;\n"
-    << "extern template struct metapod::rnea< " << namespace_ << "::Robot , true >;\n"
-    << "extern template struct metapod::crba< " << namespace_ << "::Robot , false >;\n"
-    << "extern template struct metapod::rnea< " << namespace_ << "::Robot , false >;\n";
+    << "# include \"robot.hh\"\n\n";
+  closeInclusionGuard(init_hh_, "INIT_HH");
+
 
   openInclusionGuard(joint_hh_, "JOINT_HH");
   joint_hh_
