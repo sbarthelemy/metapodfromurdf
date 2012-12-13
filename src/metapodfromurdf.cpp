@@ -114,7 +114,6 @@ RobotBuilder::~RobotBuilder()
       << tab << "enum { NBDOF = " << nb_dof_ << " };\n"
       << tab << "enum { NBBODIES = " << nb_bodies_ << " };\n"
       << tab << "static Eigen::Matrix< FloatType, NBDOF, NBDOF > H;\n"
-      << tab << "static Eigen::Matrix< FloatType, 6*NBBODIES, NBDOF > J;\n"
       << tab << "typedef Eigen::Matrix< FloatType, NBDOF, 1 > confVector;\n\n"
       << tab << "// Definition of the multibody tree as a type.\n"
       << tab << "typedef \n"
@@ -235,9 +234,7 @@ Status RobotBuilder::init()
   init_cc_
     << "\n"
     << "// Initialization of the robot global constants\n"
-    << "Eigen::Matrix< FloatType, Robot::NBDOF, Robot::NBDOF > Robot::H;\n"
-    << "Eigen::Matrix< FloatType, 6*Robot::NBBODIES, Robot::NBDOF > Robot::J\n"
-    << "    = Eigen::Matrix< FloatType, 6*Robot::NBBODIES, Robot::NBDOF >::Zero();\n";
+    << "Eigen::Matrix< FloatType, Robot::NBDOF, Robot::NBDOF > Robot::H;\n";
 
   openInclusionGuard(init_hh_, "INIT_HH");
   init_hh_
