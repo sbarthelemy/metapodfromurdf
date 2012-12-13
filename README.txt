@@ -5,7 +5,6 @@ Library and CLI tool to generate the C++ source code from a robot model
 from its description in the URDF format.
 
 The tools has glitches (grep for TODO) but might prove useful though.
-
 The library API mimicks the one from kdl_parser, in the robot_model ROS stack.
 
 Run ``metapodfromurdf-bin --help`` for some scarse help.
@@ -48,6 +47,25 @@ Headers from all these libs are needed.
 
 Module in cmake/ find them all, looking for them at the standard non-standard
 location (the one used by the official ROS ubuntu packages).
+
+How to test
+-----------
+
+Metapod comes with a simple_arm example model and has unit tests on this model.
+
+One can use the data/simple_arm.urdf example to generate an equivalent version
+of this metapod model, and run the tests again, with the following commands,
+beware this will overwrite part of your metrapod source tree::
+
+  METAPOD_SRC=~/ar/m/lib/metapod
+  metapodfromurdf-bin \
+    --name simple_arm \
+    --namespace metapod::simple_arm \
+    --inclusion-guard-prefix=METAPOD_SIMPLE_ARM_ \
+    --directory ${METAPOD_SRC}/include/metapod/models/simple-arm \
+    data/simple_arm.urdf
+
+then got to METAPOD_SRC, rebuild and run the tests.
 
 Todo/wishlist
 -------------
