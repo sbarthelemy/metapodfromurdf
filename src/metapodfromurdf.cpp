@@ -173,16 +173,21 @@ Status RobotBuilder::set_namespace(const std::string & combined_namespace)
   tokenizer tokens(combined_namespace, sep);
   namespaces_.clear();
   std::stringstream opening;
-  std::stringstream closing;
   for (tokenizer::iterator tok_iter = tokens.begin();
        tok_iter != tokens.end();
        ++tok_iter)
   {
     namespaces_.push_back(*tok_iter);
     opening << "namespace " << *tok_iter << " {\n";
-    closing << "} // closing namespace " << *tok_iter << "\n";
   }
   namespaces_opening_ = opening.str();
+  std::stringstream closing;
+  for (std::vector<std::string>::reverse_iterator rit = namespaces_.rbegin();
+       rit != namespaces_.rend();
+       ++rit)
+  {
+      closing << "} // closing namespace " << *rit << "\n";
+  }
   namespaces_closing_ = closing.str();
 
   return STATUS_SUCCESS;
