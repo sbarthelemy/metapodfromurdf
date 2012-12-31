@@ -40,12 +40,12 @@ URDF denotes several distinct but related things:
 * a library which parses XML files (both URDF-XML and COLLADA-XML) and
   returns C++ objects implementing the urdf C++ API
 
-liburdf loads xml files and returns C++ urdf::Model objects. It does so by
+So, liburdf loads xml files and returns C++ urdf::Model objects. It does so by
 calling either urdf_parser or collada_parser according to the file type.
 
 Headers from all these libs are needed.
 
-Module in cmake/ find them all, looking for them at the standard non-standard
+Modules in cmake/ find them all, looking for them at the standard non-standard
 location (the one used by the official ROS ubuntu packages).
 
 How to test
@@ -83,10 +83,11 @@ Todo/wishlist
 
 - move back to rosbuild?
 
-- depend on less ROS-related stuff?
-
-- move a subset of the tool directly in metapod?
-
-- cleanup the API
+- reduce dependencies (especially ROS-specific ones)
 
 - build a statically linked binary
+
+- move a subset of the tool directly in metapod? Some code could be factorized
+  with the benchmark model generation from metapod.
+
+- cleanup the API
