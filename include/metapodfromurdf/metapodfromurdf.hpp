@@ -39,6 +39,7 @@ public:
   RobotBuilder();
   ~RobotBuilder();
   Status set_name(const std::string& name);
+  Status set_libname(const std::string& libname);
   Status set_directory(const std::string& directory);
   Status set_namespace(const std::string& combined_namespace);
   Status set_reinclusion_guard_prefix(const std::string& text);
@@ -59,6 +60,7 @@ private:
   bool is_initialized_;
   LinkComparer link_comparer_;
   std::string name_;
+  std::string libname_;
   std::string directory_;
   std::string reinclusion_guard_prefix_;
   std::string namespace_;

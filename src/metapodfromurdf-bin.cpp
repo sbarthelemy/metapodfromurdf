@@ -24,6 +24,8 @@ int main(int argc, char** argv)
   config.add_options()
       ("name", po::value<std::string>(),
        "the robot name")
+      ("libname", po::value<std::string>(),
+       "the library name, used for DLL symbol import/export. If omitted, the value of the name option will be used")
       ("directory", po::value<std::string>(),
        "directory where the files will be generated")
       ("namespace", po::value<std::string>(),
@@ -76,6 +78,14 @@ int main(int argc, char** argv)
   if (vm.count("name"))
   {
     mmodel.set_name(vm["name"].as<std::string>());
+  }
+  if (vm.count("libname"))
+  {
+    mmodel.set_name(vm["libname"].as<std::string>());
+  }
+  else if (vm.count("name"))
+  {
+    mmodel.set_libname(vm["name"].as<std::string>());
   }
   if (vm.count("namespace"))
   {

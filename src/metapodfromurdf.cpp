@@ -107,8 +107,11 @@ RobotBuilder::~RobotBuilder()
   closeInclusionGuard(joint_hh_, "JOINT_HH");
 
   const std::string tab("  ");
+  std::string libname_uc(libname_);
+  std::transform(libname_.begin(), libname_.end(), libname_uc.begin(),
+      ::toupper);
   robot_hh_
-      << "class METAPOD_DLLEXPORT Robot {\n" // TODO: handle the DLLEXPORT as an user-defined argument
+      << "class " << libname_uc << "_DLLAPI Robot {\n"
       << "public:\n"
       << tab << "// Global constants or variable of the robot\n"
       << tab << "enum { NBDOF = " << nb_dof_ << " };\n"
@@ -143,6 +146,17 @@ Status RobotBuilder::set_name(const std::string & name)
     return STATUS_FAILURE;
   }
   name_ = name;
+  return STATUS_SUCCESS;
+}
+
+Status RobotBuilder::set_libname(const std::string & libname)
+{
+  if (is_initialized_)
+  {
+    ROS_ERROR("one cannot call set_libname() after having called init()");
+    return STATUS_FAILURE;
+  }
+  libname_ = libname;
   return STATUS_SUCCESS;
 }
 
@@ -366,6 +380,7 @@ Status RobotBuilder::addSubTree(
   metapod::createJoint(
       joint_hh_,
       init_cc_,
+      libname_,
       metapod_joint_type,
       jnt->name, // TODO: check joint->name is a valid class name
       joint_label,
@@ -379,6 +394,7 @@ Status RobotBuilder::addSubTree(
   metapod::createBody(
       body_hh_,
       init_cc_,
+      libname_,
       root->name,
       has_parent ? parent_body_name : std::string("NP"),
       jnt->name,
