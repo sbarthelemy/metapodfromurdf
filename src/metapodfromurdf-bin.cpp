@@ -1,4 +1,4 @@
-// Copyright (c) 2012 Aldebaran Robotics. All rights reserved
+// Copyright (c) 2012, 2013 Aldebaran Robotics. All rights reserved
 // Use of this source code is governed by a BSD-style license that can be
 // found in the COPYING file
 #include <iostream>
@@ -48,22 +48,22 @@ int main(int argc, char** argv)
   po::positional_options_description pos;
   pos.add("input-file", -1);
   po::variables_map vm;
-  po::store(po::command_line_parser(argc, argv).
-                  options(cmdline_options).positional(pos).run(), vm);
   po::options_description visible("Usage:\n metapodfromurdf-bin [options] input-file\n\nOptions");
   visible.add(generic).add(config);
-  if (vm.count("help"))
-  {
-    std::cout << visible << "\n";
-    return 0;
-  }
   // we do not parse config files for now
   //po::options_description config_file_options;
   //config_file_options.add(config).add(hidden);
   try {
+    po::store(po::command_line_parser(argc, argv).
+                  options(cmdline_options).positional(pos).run(), vm);
+    if (vm.count("help"))
+    {
+      std::cout << visible << "\n";
+      return 0;
+    }
     po::notify(vm);
   }
-  catch(boost::program_options::required_option)
+  catch(boost::program_options::error)
   {
     std::cout << visible << "\n";
     return 0;
