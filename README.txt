@@ -1,13 +1,12 @@
 metapodfromurdf
 ---------------
 
-Library and CLI tool to generate the C++ source code from a robot model
-from its description in the URDF format.
+CLI tool to generate the C++ source code from a robot model from its
+description in the URDF format.
 
 The tools has glitches (grep for TODO) but might prove useful though.
-The library API mimicks the one from kdl_parser, in the robot_model ROS stack.
 
-Run ``metapodfromurdf-bin --help`` for some scarse help.
+Run ``metapodfromurdf --help`` for some scarse help.
 
 Be aware that
 
@@ -16,19 +15,19 @@ Be aware that
 
 * the URDF parser mixes up the joint ordering found in the URDF file.
   Joint ordering in metapod is important since it defines the meaning of
-  the lines and columins in the linearized model. By default, joints are
+  the lines and columns in the linearized model. By default, joints are
   ordered by walking the tree by depth first, with siblings sorted
-  alphabetically. metapodfromurdf-bin lets you re-order siblings with the
+  alphabetically. metapodfromurdf lets you re-order siblings with the
   --joint argument.
 
 Dependencies
 ------------
 
-* metapod (for some utilities)
+* metapod_robotbuilder
 * eigen3
 * urdf and tinyxml
 * roscpp
-* boost program options
+* boost program_options
 
 URDF disambiguation
 -------------------
@@ -51,33 +50,31 @@ location (the one used by the official ROS ubuntu packages).
 How to test
 -----------
 
-Metapod comes with a simple_arm example model and has unit tests on this model.
+Metapod comes with two exaple models: simple_arm and simple_humanoid.
 
 One can use the data/simple_arm.urdf example to generate an equivalent version
-of this metapod model, and run the tests again, with the following commands,
-beware this will overwrite part of your metrapod source tree::
+of this metapod model, and compare it to the original. The following line
+will write it in /tmp/simple-arm.urdf::
 
-  METAPOD_SRC=~/ar/m/lib/metapod
-  metapodfromurdf-bin \
-    --name simple_arm \
-    --namespace metapod::simple_arm \
-    --inclusion-guard-prefix=METAPOD_SIMPLE_ARM_ \
-    --directory ${METAPOD_SRC}/include/metapod/models/simple-arm \
+  metapodfromurdf
+    --config-file=data/simple_arm.config \
     data/simple_arm.urdf
 
-then got to METAPOD_SRC, rebuild and run the tests.
+You might also want to write it directly in your metapod source tree,
+and build it to ensure it passes the automated tests::
+
+  METAPOD_SRC=~/ar/m/lib/metapod
+  metapodfromurdf
+    --config-file=data/simple_arm.config \
+    --directory ${METAPOD_SRC}/include/metapod/models/simple-arm \
+    data/simple_arm.urdf
 
 Todo/wishlist
 -------------
 
-- add an option to choose between REVOLUTE_AXIS_{X,ANY}
-
 - add a little test (sigh)
 
 - deal with the floating joint, which we require but is deprecated in URDF
-
-- instead of generating files directly, let the user pass ostreams and fill
-  them
 
 - filter models from a python script
 
@@ -86,8 +83,3 @@ Todo/wishlist
 - reduce dependencies (especially ROS-specific ones)
 
 - build a statically linked binary
-
-- move a subset of the tool directly in metapod? Some code could be factorized
-  with the benchmark model generation from metapod.
-
-- cleanup the API
