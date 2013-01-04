@@ -466,7 +466,7 @@
   </joint>
 
   <joint name="WAIST_P" type="revolute">
-    <origin xyz="0 0 0.176" rpy="0 0 0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
     <parent link="WAIST_LINK0"/>
     <child link="WAIST_LINK1"/>

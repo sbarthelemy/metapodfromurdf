@@ -53,21 +53,22 @@ How to test
 Metapod comes with two exaple models: simple_arm and simple_humanoid.
 
 One can use the data/simple_arm.urdf example to generate an equivalent version
-of this metapod model, and compare it to the original. The following line
-will write it in /tmp/simple-arm.urdf::
+of this metapod model, and compare it to the original::
 
   metapodfromurdf
     --config-file=data/simple_arm.config \
     data/simple_arm.urdf
-
-You might also want to write it directly in your metapod source tree,
-and build it to ensure it passes the automated tests::
-
-  METAPOD_SRC=~/ar/m/lib/metapod
   metapodfromurdf
-    --config-file=data/simple_arm.config \
-    --directory ${METAPOD_SRC}/include/metapod/models/simple-arm \
-    data/simple_arm.urdf
+    --config-file=data/simple_humanoid.config \
+    data/simple_humanoid.urdf
+
+By default, the models are writen to /tmp/simple-{arm,humanoid}.
+
+You might also want to write them directly in your metapod source tree,
+and build it to ensure it passes the automated tests. Just provide the
+proper --directory option. For instance::
+
+  --directory ${METAPOD_SRC}/include/metapod/models/simple-humanoid
 
 Todo/wishlist
 -------------
