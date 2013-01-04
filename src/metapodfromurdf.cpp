@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the COPYING file
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -114,6 +115,7 @@ Status addSubTree(
     boost::shared_ptr<const urdf::Link> root,
     const std::string& parent_body_name,
     bool prefer_fixed_axis,
+    const std::map<std::string, int>& joint_dof_index,
     bool has_parent)
 {
   const std::string tab("\t");
@@ -174,7 +176,11 @@ Status addSubTree(
            root->inertial->ixz, root->inertial->iyz, root->inertial->izz;
     rotational_inertia = R * tmp;
   }
-
+  int dof_index = -1;
+  std::map<std::string, int>::const_iterator it =
+      joint_dof_index.find(jnt->name);
+  if (it != joint_dof_index.end())
+      dof_index = it->second;
   Status status = builder.addLink(
       has_parent ? parent_body_name : std::string("NP"),
       jnt->name,
@@ -185,7 +191,8 @@ Status addSubTree(
       mass,
       center_of_mass,
       rotational_inertia,
-      toEigen(jnt->axis));
+      toEigen(jnt->axis),
+      dof_index);
   if (status == STATUS_FAILURE)
     return STATUS_FAILURE;
 
@@ -194,7 +201,7 @@ Status addSubTree(
   {
     const bool has_parent = true;
     status = addSubTree(builder, link_comparer,children[i], root->name,
-                        prefer_fixed_axis, has_parent);
+                        prefer_fixed_axis, joint_dof_index, has_parent);
     if (status == STATUS_FAILURE)
       return STATUS_FAILURE;
   }
@@ -203,7 +210,7 @@ Status addSubTree(
 
 Status treeFromUrdfModel(const urdf::ModelInterface& robot_model,
     metapod::RobotBuilder& builder, const LinkComparer& link_comparer,
-    bool prefer_fixed_axis)
+    bool prefer_fixed_axis, const std::map<std::string, int>& joint_dof_index)
 {
   //  add all children
   bool is_success = false;
@@ -216,6 +223,7 @@ Status treeFromUrdfModel(const urdf::ModelInterface& robot_model,
         robot_model.getRoot()->child_links[i],
         std::string("GROUND"),
         prefer_fixed_axis,
+        joint_dof_index,
         has_parent);
   }
 }
@@ -251,6 +259,10 @@ int main(int argc, char** argv)
        "prefix for the reinclusion guards. Usually ends with '_'")
       ("license-file", po::value<std::string>(),
         "license text, will be copied on top of every generated file")
+      ("joint-dof-index", po::value<std::vector<std::string> >(),
+        "joint name to dof index mapping, in the form "
+        "joint_name:dof_index, this option should be passed either for "
+        "every joint of for none at all")
       ("joint", po::value<std::vector<std::string> >(),
         "joint name, pass several of them to specify joints ordering")
       ("prefer-fixed-axis",
@@ -276,6 +288,9 @@ int main(int argc, char** argv)
   po::options_description visible("Usage:\n metapodfromurdf-bin [options] input-file\n\nOptions");
   visible.add(generic).add(config);
   po::variables_map vm;
+  std::map<std::string, int> joint_dof_index;
+  metapod::RobotBuilder builder;
+  LinkComparer link_comparer;
   try {
     po::store(po::command_line_parser(argc, argv).
                   options(cmdline_options).positional(pos).run(),
@@ -295,6 +310,34 @@ int main(int argc, char** argv)
       }
     }
     po::notify(vm);
+    if (vm.count("joint-dof-index"))
+    {
+      std::vector<std::string> pairs =
+          vm["joint-dof-index"].as<std::vector<std::string> >();
+      for (std::vector<std::string>::const_iterator it = pairs.begin();
+           it != pairs.end();
+           ++it)
+      {
+        // Tokenize the string on the ":" delimiter.
+        std::vector< std::string > tokens;
+        boost::split(tokens, *it, boost::is_any_of( ":" ));
+
+        using boost::program_options::validation_error;
+        if (tokens.size() != 2)
+        {
+           throw validation_error(validation_error::invalid_option_value,
+                                  "joint-dof-index", *it);
+        }
+        int value = -1;
+        if (!(std::stringstream(tokens[1]) >> value))
+        {
+           throw validation_error(validation_error::invalid_option_value,
+                                  "joint-dof-index", *it);
+        }
+        joint_dof_index[tokens[0]] = value;
+      }
+      builder.set_use_dof_index(true);
+    }
   }
   catch(boost::program_options::error)
   {
@@ -307,8 +350,6 @@ int main(int argc, char** argv)
     std::cerr << "Could not generate robot model" << std::endl;
     return 1;
   }
-  metapod::RobotBuilder builder;
-  LinkComparer link_comparer;
 
   if (vm.count("name"))
   {
@@ -359,5 +400,5 @@ int main(int argc, char** argv)
   }
 
   return treeFromUrdfModel(robot_model, builder, link_comparer,
-                           prefer_fixed_axis);
+                           prefer_fixed_axis, joint_dof_index);
 }
