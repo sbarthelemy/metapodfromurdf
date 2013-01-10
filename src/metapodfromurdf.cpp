@@ -253,10 +253,6 @@ int main(int argc, char** argv)
        "value of the name option will be used")
       ("directory", po::value<std::string>(),
        "directory where the files will be generated")
-      ("namespace", po::value<std::string>(),
-       "namespace the generated code will lie in (possibly composed)")
-      ("inclusion-guard-prefix", po::value<std::string>(),
-       "prefix for the reinclusion guards. Usually ends with '_'")
       ("license-file", po::value<std::string>(),
         "license text, will be copied on top of every generated file")
       ("joint-dof-index", po::value<std::vector<std::string> >(),
@@ -357,23 +353,15 @@ int main(int argc, char** argv)
   }
   if (vm.count("libname"))
   {
-    builder.set_name(vm["libname"].as<std::string>());
+    builder.set_libname(vm["libname"].as<std::string>());
   }
   else if (vm.count("name"))
   {
     builder.set_libname(vm["name"].as<std::string>());
   }
-  if (vm.count("namespace"))
-  {
-    builder.set_namespace(vm["namespace"].as<std::string>());
-  }
   if (vm.count("directory"))
   {
     builder.set_directory(vm["directory"].as<std::string>());
-  }
-  if (vm.count("inclusion-guard-prefix"))
-  {
-    builder.set_reinclusion_guard_prefix(vm["inclusion-guard-prefix"].as<std::string>());
   }
   if (vm.count("license-file"))
   {
@@ -393,12 +381,11 @@ int main(int argc, char** argv)
   {
     prefer_fixed_axis = true;
   }
-
-  if (builder.init() == STATUS_FAILURE)
+  Status status = treeFromUrdfModel(robot_model, builder, link_comparer,
+      prefer_fixed_axis, joint_dof_index);
+  if (status == STATUS_FAILURE)
   {
     return STATUS_FAILURE;
   }
-
-  return treeFromUrdfModel(robot_model, builder, link_comparer,
-                           prefer_fixed_axis, joint_dof_index);
+  return builder.write();
 }
